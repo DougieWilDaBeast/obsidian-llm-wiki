@@ -1,0 +1,23 @@
+# Transcribe new voice clips dropped into the staging dir by the sync transport.
+# Pairs with wiki-transcribe.timer. Runs pipeline/transcribe_new.sh (faster-whisper
+# + ffmpeg denoise), holding the ingest lock so the auto-commit timer won't commit
+# a half-written transcript. Idempotent via the sha256 ledger.
+#
+# Requires a python venv with faster-whisper and ffmpeg on PATH — see SETUP.md.
+#
+# Install (as your normal user):
+#   cp pipeline/systemd/wiki-transcribe.service ~/.config/systemd/user/
+#   cp pipeline/systemd/wiki-transcribe.timer   ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now wiki-transcribe.timer
+
+[Unit]
+Description=Transcribe new voice clips into 00-Raw/Voice
+
+[Service]
+Type=oneshot
+Environment=VAULT_ROOT=%h/obsidian-llm-wiki
+# Point these at your setup (see .env.example):
+Environment=AUDIO_STAGING=%h/VoiceRecordings/Voice Recorder
+Environment=WHISPER_VENV=%h/voice-pipeline/venv/bin/activate
+ExecStart=%h/obsidian-llm-wiki/pipeline/transcribe_new.sh

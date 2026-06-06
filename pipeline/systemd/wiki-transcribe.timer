@@ -1,0 +1,11 @@
+# Check for new voice clips to transcribe every 10 minutes.
+
+[Unit]
+Description=Periodically transcribe new voice clips
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target

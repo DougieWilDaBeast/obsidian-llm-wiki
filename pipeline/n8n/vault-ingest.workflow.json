@@ -1,0 +1,65 @@
+{
+  "name": "Wiki — auto-ingest new raw sources (TEMPLATE, DORMANT)",
+  "meta": {
+    "description": "Watches the mounted vault (/vault/00-Raw) for new files and runs pipeline/ingest_one.sh on the HOST for each. SHIPS DISABLED: the trigger nodes have \"disabled\": true and ingest_one.sh is itself a no-op until INGEST_CMD is configured. Runs in the n8n Docker container; since the container has no git/model, the Execute Command SSHes back to the host. To activate: choose a model backend, wire INGEST_CMD on the host, set up the container->host SSH key, enable the trigger nodes, then activate the workflow. Replace SERVER_USER, SERVER_IP and VAULT_PATH below with your values.",
+    "templateId": "llm-wiki-ingest"
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/vault/00-Raw/Voice",
+        "events": ["add"],
+        "options": { "usePolling": true, "interval": 30, "intervalUnit": "seconds" }
+      },
+      "id": "watch-voice",
+      "name": "Watch 00-Raw/Voice",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [240, 200],
+      "disabled": true,
+      "notes": "DISABLED until activation. Polls for new .md transcripts dropped by the voice pipeline."
+    },
+    {
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/vault/00-Raw/Clippings",
+        "events": ["add"],
+        "options": { "usePolling": true, "interval": 30, "intervalUnit": "seconds" }
+      },
+      "id": "watch-clippings",
+      "name": "Watch 00-Raw/Clippings",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "disabled": true,
+      "notes": "DISABLED until activation. Polls for new web clippings from the Obsidian Web Clipper."
+    },
+    {
+      "parameters": {
+        "command": "=HOST_RAW=$(echo '{{ $json[\"path\"] }}' | sed 's#^/vault#VAULT_PATH#'); ssh -i /home/node/.ssh/wiki_ingest SERVER_USER@SERVER_IP \"VAULT_PATH/pipeline/ingest_one.sh '$HOST_RAW'\""
+      },
+      "id": "run-ingest",
+      "name": "Run ingest_one.sh (on host)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [560, 300],
+      "notes": "Maps the container path (/vault/...) back to the host path and SSHes to the host to run ingest_one.sh, which holds the shared ingest lock, runs $INGEST_CMD, and commits one source per run. Replace VAULT_PATH, SERVER_USER and SERVER_IP. Needs a container->host SSH key at /home/node/.ssh/wiki_ingest (set up at activation). No-op while INGEST_CMD is unset."
+    }
+  ],
+  "connections": {
+    "Watch 00-Raw/Voice": {
+      "main": [[{ "node": "Run ingest_one.sh (on host)", "type": "main", "index": 0 }]]
+    },
+    "Watch 00-Raw/Clippings": {
+      "main": [[{ "node": "Run ingest_one.sh (on host)", "type": "main", "index": 0 }]]
+    }
+  }
+}

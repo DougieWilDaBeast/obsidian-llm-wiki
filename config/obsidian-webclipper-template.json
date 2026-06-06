@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "0.1.0",
+  "name": "Wiki Clipping",
+  "behavior": "create",
+  "noteNameFormat": "Clipping — {{title}}",
+  "path": "00-Raw/Clippings",
+  "noteContentFormat": "{{content}}",
+  "properties": [
+    { "name": "type", "value": "clipping", "type": "text" },
+    { "name": "title", "value": "{{title}}", "type": "text" },
+    { "name": "source", "value": "{{url}}", "type": "text" },
+    { "name": "author", "value": "{{author}}", "type": "text" },
+    { "name": "published", "value": "{{published|date:\"YYYY-MM-DD\"}}", "type": "date" },
+    { "name": "clipped", "value": "{{date|date:\"YYYY-MM-DD\"}}", "type": "date" },
+    { "name": "site", "value": "{{domain}}", "type": "text" },
+    { "name": "description", "value": "{{description}}", "type": "text" },
+    { "name": "tags", "value": "clipping", "type": "multitext" }
+  ],
+  "triggers": [],
+  "context": ""
+}

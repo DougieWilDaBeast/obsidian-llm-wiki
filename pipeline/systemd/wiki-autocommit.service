@@ -1,0 +1,18 @@
+# Auto-commit & sync the wiki working tree (the server is the only git brain).
+# Pairs with wiki-autocommit.timer. Runs pipeline/vault_autocommit.sh, which
+# commits device edits dropped in by the sync transport, rebases onto the remote,
+# and pushes. Skips itself while an ingest holds the lock.
+#
+# Install (as your normal user):
+#   cp pipeline/systemd/wiki-autocommit.service ~/.config/systemd/user/
+#   cp pipeline/systemd/wiki-autocommit.timer   ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now wiki-autocommit.timer
+
+[Unit]
+Description=Auto-commit and sync the wiki working tree
+
+[Service]
+Type=oneshot
+Environment=VAULT_ROOT=%h/obsidian-llm-wiki
+ExecStart=%h/obsidian-llm-wiki/pipeline/vault_autocommit.sh

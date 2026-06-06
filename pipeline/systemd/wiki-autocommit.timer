@@ -1,0 +1,11 @@
+# Run the wiki auto-commit/sync every 2 minutes.
+
+[Unit]
+Description=Periodically commit and sync the wiki working tree
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+
+[Install]
+WantedBy=timers.target

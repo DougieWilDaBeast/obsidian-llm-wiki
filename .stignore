@@ -1,0 +1,14 @@
+// SyncThing exclusions for the vault working tree.
+// CRITICAL: never sync .git — git writes many small files concurrently and
+// SyncThing would corrupt the repo. The server holds the real .git; the phone
+// gets the working tree only.
+.git
+.git/**
+// Volatile / per-device Obsidian state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspace*.json
+.obsidian/cache
+.trash
+// Local secrets
+.env

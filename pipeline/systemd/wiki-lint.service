@@ -1,0 +1,27 @@
+# Weekly wiki Lint pass (optional automation, DORMANT by default).
+#
+# Pairs with wiki-lint.timer. Runs pipeline/lint_pass.sh, which is itself a
+# no-op until INGEST_CMD is configured — so installing/enabling the timer cannot
+# trigger a real lint before you activate the model backend.
+#
+# These units use %h (the user's home). Adjust the path below if your repo lives
+# elsewhere than ~/obsidian-llm-wiki.
+#
+# Install (as your normal user, only when ready to schedule):
+#   cp pipeline/systemd/wiki-lint.service ~/.config/systemd/user/
+#   cp pipeline/systemd/wiki-lint.timer   ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now wiki-lint.timer
+#   systemctl --user list-timers | grep lint
+# (For timers to fire while you're logged out: `loginctl enable-linger $USER`.)
+
+[Unit]
+Description=Wiki weekly Lint pass (CLAUDE.md Lint workflow)
+
+[Service]
+Type=oneshot
+Environment=VAULT_ROOT=%h/obsidian-llm-wiki
+# INGEST_CMD is intentionally NOT set here — the pass stays dormant until a model
+# backend is chosen. To activate, add e.g.:
+#   Environment=INGEST_CMD=%h/obsidian-llm-wiki/pipeline/ingest_backend.sh
+ExecStart=%h/obsidian-llm-wiki/pipeline/lint_pass.sh

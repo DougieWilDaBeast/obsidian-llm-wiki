@@ -1,0 +1,27 @@
+# Obsidian — ignore per-machine workspace state, keep shared plugin configs
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspace*.json
+
+# Obsidian cache / trash
+.obsidian/cache
+.trash/
+
+# Local environment / secrets — NEVER commit your real values
+.env
+
+# Voice pipeline runtime state (lives outside the repo by default, ignored if placed here)
+ledger.json
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor / temp
+*.tmp
+*.swp
+*~

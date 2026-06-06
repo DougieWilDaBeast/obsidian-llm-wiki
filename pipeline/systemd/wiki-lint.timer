@@ -1,0 +1,14 @@
+# Weekly schedule for the wiki Lint pass (optional automation, DORMANT).
+# Fires wiki-lint.service every Monday 04:00 local. The service runs
+# lint_pass.sh, which is a no-op until INGEST_CMD is configured.
+
+[Unit]
+Description=Run the wiki Lint pass weekly
+
+[Timer]
+OnCalendar=Mon *-*-* 04:00:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,21 @@
+# Normalise line endings across devices (Linux server = LF, Windows laptop, phone).
+# Without this, Windows git (core.autocrlf=true) rewrites every server-authored
+# file as CRLF, making immutable 00-Raw sources show as spuriously "modified".
+# Force LF in the repo and on checkout everywhere.
+* text=auto eol=lf
+
+# Markdown and the vault's text formats are always LF.
+*.md   text eol=lf
+*.json text eol=lf
+*.py   text eol=lf
+*.sh   text eol=lf
+
+# Binary assets — never touch.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.m4a  binary
+*.wav  binary
+*.mp3  binary
