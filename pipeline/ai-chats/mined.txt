@@ -1,0 +1,4 @@
+# AI-Chats Phase 3 — conversations deep-mined into insight pages.
+# One conversation id per line (+ optional note). Used by shortlist.py to track progress.
+# Example:
+# 1a2b3c4d  choosing a sensor for the weather station (BME280 vs DHT22)

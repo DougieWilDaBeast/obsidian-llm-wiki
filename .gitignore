@@ -25,3 +25,28 @@ $RECYCLE.BIN/
 *.tmp
 *.swp
 *~
+
+# Wearable pipeline secrets / local state — never commit (tokens, client secret).
+# Real state lives OUTSIDE the repo ($WEARABLES_STATE_DIR, default ~/whoop-pipeline/); these
+# guard against accidents.
+whoop.env
+**/whoop-pipeline/
+state.json
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# AI-chat exports — keep the per-conversation split .md archive (committed); ignore the bulky,
+# redundant raw export blobs and the generated catalog sidecar (CLAUDE.md §8a).
+00-Raw/AI-Chats/**/conversations.json
+00-Raw/AI-Chats/**/conversations-*.json
+00-Raw/AI-Chats/**/*.zip
+pipeline/ai-chats/catalog.json
+pipeline/ai-chats/.out/
+# ChatGPT arrives as a nested hash subfolder of binaries (chat.html, images, audio, dalle) plus
+# chunked JSON. Ignore the whole raw export tree; keep only the generated top-level split *.md.
+00-Raw/AI-Chats/ChatGPT/*/
+
+# Per-arc Book manuscripts are regenerated on demand (CLAUDE.md §13); Book.md + Seed.md are committed.
+90-Export/Book — *.md

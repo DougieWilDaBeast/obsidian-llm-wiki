@@ -8,6 +8,8 @@ in order; each stage is useful on its own, so you can stop after the parts you w
 - **Stage 3 — Voice transcription** (optional): faster-whisper + ffmpeg.
 - **Stage 4 — Sync transport** (optional): get captures from your phone to a server.
 - **Stage 5 — Automation** (optional): systemd timers and/or the n8n file-watcher.
+- **Stage 6 — Agent skills** (optional): repeatable ingest / audit / discovery / story workflows.
+- **Stage 7 — More sources** (optional): AI-chat exports, wearables, OCR notes.
 
 A companion list of the things that _will_ bite you is in
 [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md). Skim it before Stage 5.
@@ -24,6 +26,7 @@ A companion list of the things that _will_ bite you is in
 | Python ≥ 3.9        | voice transcription (Stage 3)   | `python3 --version` |
 | ffmpeg              | audio denoise (Stage 3)         | `ffmpeg -version`   |
 | Docker _(optional)_ | the n8n watcher (Stage 5)       | `docker --version`  |
+| PowerShell 7 _(optional)_ | the agent-skill scripts (Stage 6) | `pwsh --version` |
 
 > **Linux/macOS** are the primary targets (the scripts are bash and the timers are systemd).
 > On **Windows**, run the server-side pieces under WSL2.
@@ -43,6 +46,10 @@ A companion list of the things that _will_ bite you is in
 2. **Open it as an Obsidian vault.** In Obsidian: _Open folder as vault_ → pick this folder.
    Read [`CLAUDE.md`](CLAUDE.md) — it's the schema the agent follows and the file you'll edit
    to evolve the system.
+
+   The shared `.obsidian/` settings enable two community plugins, **Dataview** (powers
+   [`Dashboard.md`](Dashboard.md)) and **Omnisearch**. Their code isn't committed: install both
+   from _Settings → Community plugins → Browse_ and Obsidian picks up the committed config.
 
 3. **Decide what's real.** This repo ships with a **synthetic example vault** under `00-Raw/`
    and `10-Refined/`. When you're ready to use it for real, delete the example pages (keep the
@@ -147,6 +154,8 @@ Local, free voice-to-text with [faster-whisper](https://github.com/SYSTRAN/faste
    - `AUDIO_STAGING` — folder new phone clips land in
    - `WHISPER_VENV` — path to the venv's `activate` script
    - `VAULT_ROOT` — the repo path
+   - `WHISPER_OFFLINE=1` — once the model has downloaded, load it from the local cache only so
+     timer runs never touch the network (`--offline` on `backfill_transcribe.py`)
 
 ---
 
@@ -219,6 +228,72 @@ It watches the mounted `00-Raw/` folders and, on a new file, SSHes back to the h
 
 ---
 
+## Stage 6 — Agent skills (optional)
+
+`.github/skills/` holds six skills: each is a `SKILL.md` your agent reads (Claude Code, GitHub
+Copilot and similar agents pick up skills from a folder like this), plus templates and a helper
+script that does the discovery work in one shot so the agent spends tokens on judgement, not on
+opening files. The helper scripts are PowerShell 7 and run on Linux, macOS and Windows
+(`pwsh`; on Linux install it from your package manager or the PowerShell GitHub releases).
+
+| Skill             | Use it when you want to…                                                       |
+| ----------------- | ------------------------------------------------------------------------------ |
+| `vault-ingest`    | file everything new in `00-Raw/` (sync, find uncovered raws, write pages, commit) |
+| `vault-audit`     | spot-check a few random pages against their sources; get questions, not fixes   |
+| `mushroom-mode`   | find surprising links between far-apart notes (writes to a scratch list only)   |
+| `full-diagnostic` | get one health report across the vault and a recommended run order              |
+| `ai-chat-mine`    | mine archived AI chats for your own insights, a batch at a time (Stage 7)       |
+| `story-agent`     | maintain the optional `30-Story/` self-narrative and build `90-Export/`         |
+
+Try them on the example vault first, for instance:
+
+```bash
+pwsh -File .github/skills/full-diagnostic/scripts/run-diagnostic.ps1
+pwsh -File .github/skills/vault-audit/scripts/pick-sections.ps1 -Count 2 -BiasUnaudited
+```
+
+Then ask your agent to "run a full diagnostic" or "mushroom mode" and it will follow the skill.
+
+---
+
+## Stage 7 — More sources (optional)
+
+### 7a. AI-chat exports (ChatGPT / Claude)
+
+Exported conversations are **low-trust** (only your own turns are authentic), so they go through
+a staged funnel (CLAUDE.md §8a):
+
+1. Put the export's `conversations.json` in `00-Raw/AI-Chats/Claude/` or
+   `00-Raw/AI-Chats/ChatGPT/` (the bulky export files are git-ignored).
+2. **Stage A** — archive + catalog, no ingestion:
+   `python3 pipeline/ai-chats/split_exports.py`
+3. **Stage B** — harvest and rank your own turns, then mine a batch with the `ai-chat-mine` skill:
+
+   ```bash
+   python3 pipeline/ai-chats/extract_human.py
+   python3 pipeline/ai-chats/shortlist.py | head -30   # honours flagged.txt, skips mined.txt
+   python3 pipeline/ai-chats/next_unmined.py --top 6
+   ```
+
+   `score.py` is an optional extra triage pass with a local Ollama model (`OLLAMA_URL`,
+   `OLLAMA_MODEL`); nothing leaves your machines.
+
+### 7b. Wearables
+
+`pipeline/wearables/` lands one immutable JSON per day per device and rolls them into weekly
+stat sidecars the agent turns into prose digests (CLAUDE.md §8b). It ships with a WHOOP adapter;
+any other device is one new adapter onto the `daily-metrics/v1` format. Setup, OAuth and the
+daily timer are in [`pipeline/wearables/README.md`](pipeline/wearables/README.md). Secrets and
+derived state live **outside the repo** in `WEARABLES_STATE_DIR` (default `~/whoop-pipeline`).
+
+### 7c. OCR notes
+
+Photograph a handwritten note, run any OCR tool, and save just the extracted **text** as a
+Markdown file in `00-Raw/OCR/` (the photo stays out of git). Ingest keeps the text verbatim under
+`## Original scan (OCR)` and flags anything garbled.
+
+---
+
 ## Verification checklist
 
 - [ ] `bash pipeline/selftest_ingest.sh` prints all PASS and leaves the tree clean.
@@ -227,3 +302,5 @@ It watches the mounted `00-Raw/` folders and, on a new file, SSHes back to the h
 - [ ] `git log` on your real vault is in a **private** repo.
 - [ ] `systemctl --user list-timers | grep wiki` shows your enabled timers.
 - [ ] (n8n) dropping a file in a watched folder triggers an execution in the n8n UI.
+- [ ] (skills) `pwsh -File .github/skills/full-diagnostic/scripts/run-diagnostic.ps1` prints a
+      report and changes nothing.

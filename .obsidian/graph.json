@@ -1,0 +1,65 @@
+{
+  "collapse-filter": false,
+  "search": "-path:00-Raw -file:index -file:log -file:Seed",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": false,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "path:10-Refined/MOCs  ",
+      "color": {
+        "a": 1,
+        "rgb": 14268752
+      }
+    },
+    {
+      "query": "path:00-Raw  ",
+      "color": {
+        "a": 1,
+        "rgb": 11053223
+      }
+    },
+    {
+      "query": "path:30-Story  ",
+      "color": {
+        "a": 1,
+        "rgb": 12269255
+      }
+    },
+    {
+      "query": "[\"type\":\"project\"]",
+      "color": {
+        "a": 1,
+        "rgb": 16754030
+      }
+    },
+    {
+      "query": "[\"type\":\"person\"]",
+      "color": {
+        "a": 1,
+        "rgb": 8019680
+      }
+    },
+    {
+      "query": "[\"type\":\"concept\"]",
+      "color": {
+        "a": 1,
+        "rgb": 16198957
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": true,
+  "textFadeMultiplier": -1.7,
+  "nodeSizeMultiplier": 1.15416481316726,
+  "lineSizeMultiplier": 0.466873331850534,
+  "collapse-forces": true,
+  "centerStrength": 0.270490435943061,
+  "repelStrength": 12.8136120996441,
+  "linkStrength": 0.553881227758007,
+  "linkDistance": 271,
+  "scale": 0.33425905988020194,
+  "close": true
+}

@@ -1,0 +1,12 @@
+# AI-Chats Phase 3 — YOUR flagged conversations to mine first.
+#
+# You have the full context the heuristic ranker can't see — so anything you list here
+# JUMPS TO THE TOP of the mining queue, regardless of its score. Browse [[AI-Chats catalog]]
+# to find them.
+#
+# One per line: EITHER an 8-char conversation id (the bit after " - " in the filename / catalog
+# link) OR a title substring (case-insensitive). Lines starting with # are ignored.
+#
+# Examples (delete or replace with your own):
+# Choosing a sensor for an outdoor weather station
+# 1a2b3c4d
