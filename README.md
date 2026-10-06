@@ -24,7 +24,7 @@ filing, linking, and tidying outpace the value and the whole thing rots. This pr
 simple: **make maintenance cost ~zero by handing it to an agent**, so the knowledge actually
 compounds.
 
-The design splits the vault into three layers with one hard rule — **raw is immutable, refined
+The design splits the vault into three core layers with one hard rule — **raw is immutable, refined
 is the agent's**:
 
 ```mermaid
@@ -49,6 +49,7 @@ flowchart LR
 | **Raw**     | `00-Raw/`            | inputs      | Immutable. Read-only source of truth. Organised by source, never topic.          |
 | **Refined** | `10-Refined/`        | the agent   | The wiki. Flat. Held together by `[[wikilinks]]` + Maps of Content, not folders. |
 | **Spine**   | `index.md`, `log.md` | the agent   | A catalog of every page and an append-only timeline of every operation.          |
+| **Story** _(optional)_ | `30-Story/`, `90-Export/` | the agent, human signs off | A grounded, first-person self-narrative built from the wiki, exported as `Book.md` / `Seed.md`. |
 
 The full schema — page types, frontmatter, naming, linking rules, and the ingest/query/lint
 operations the agent runs — is documented in [`CLAUDE.md`](CLAUDE.md). That file _is_ the
@@ -61,8 +62,13 @@ system; read it to understand how the agent behaves.
 ```
 CLAUDE.md                     the schema / agent brain (read this first)
 index.md, log.md              the catalog and the timeline (example versions included)
-00-Raw/                       immutable inputs (Inbox / Voice / Clippings / Archive / assets)
+Dashboard.md                  Dataview health view: coverage gaps, orphans, stubs, digest freshness
+00-Raw/                       immutable inputs (Inbox / Voice / Clippings / OCR / Wearables / AI-Chats / Archive)
 10-Refined/                   the agent-built wiki (example pages + MOCs included)
+30-Story/, 90-Export/         optional self-narrative layer + its generated export (examples included)
+.github/skills/               agent skills: vault-ingest, vault-audit, mushroom-mode,
+                              full-diagnostic, ai-chat-mine, story-agent
+.obsidian/                    shared vault settings (Dataview + Omnisearch, graph colours)
 pipeline/
   ingest_one.sh               headless single-source ingest (DORMANT by default)
   lint_pass.sh                periodic health-check pass (DORMANT by default)
@@ -70,6 +76,8 @@ pipeline/
   transcribe_new.sh           transcribe new voice clips (faster-whisper + ffmpeg denoise)
   backfill_transcribe.py      bulk/idempotent transcription with a sha256 ledger
   selftest_ingest.sh          non-destructive safety self-test for the ingest scaffold
+  ai-chats/                   ChatGPT/Claude export splitter, human-turn harvester, rankers
+  wearables/                  device-agnostic daily-metrics intake (WHOOP adapter included)
   n8n/                        optional file-watcher automation (Docker + workflow template)
   systemd/                    optional user timers (lint / autocommit / transcribe)
 config/                       Obsidian Web Clipper template
@@ -97,6 +105,24 @@ fictional) so you can see the shape of inputs and the pages an agent produces fr
    git authority so editing devices never run git.
 5. **Lint** (weekly). `lint_pass.sh` runs the agent's health-check: orphans, contradictions,
    stale stubs, missing cross-references.
+
+### More sources, same rules
+
+- **AI chats** are `trust: low`: exports are archived and catalogued first, and only the human's
+  own turns are mined; any model claim stays in a `> [!review]` callout until something
+  trustworthy backs it up.
+- **Wearables and task exports** are dense data, so they become weekly / monthly **digests**,
+  never a page per day, and any gap in the data is flagged rather than averaged over.
+- **OCR notes** keep the extracted text verbatim under the summary, like voice transcripts.
+
+### Skills: repeatable agent workflows
+
+`.github/skills/` turns the common jobs into one-command workflows the agent follows: ingest new
+sources, **spot-audit** random pages against their sources (it asks questions instead of
+"fixing"), **mushroom mode** (deliberately ignore the existing structure to surface surprising
+links between distant notes), a **full diagnostic** that recommends what to run next, AI-chat
+mining, and the optional **story** layer. Each ships a helper script that does the discovery in
+one shot so the agent spends its tokens on judgement.
 
 ### Safety: dormant by default
 
@@ -140,6 +166,9 @@ before you start are in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
 | **bash + systemd user timers**                                                                  | the glue and the schedule                                              |
 | [n8n](https://n8n.io) _(optional)_                                                              | no-code file-watcher that triggers ingest on capture                   |
 | A sync transport (e.g. [SyncThing](https://syncthing.net) / [Tailscale](https://tailscale.com)) | moves captures from phone to server privately                          |
+| [Dataview](https://blacksmithgu.github.io/obsidian-dataview/) + Omnisearch _(Obsidian plugins)_ | the dashboard queries and fast full-text search                        |
+| **PowerShell 7** _(optional)_                                                                   | the agent-skill helper scripts (cross-platform)                        |
+| [Ollama](https://ollama.com) _(optional)_                                                       | local-model triage of AI-chat questions                                |
 
 ---
 
@@ -150,6 +179,9 @@ before you start are in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
 - [x] **Voice pipeline** — faster-whisper + ffmpeg denoise + idempotent ledger
 - [ ] **Automatic ingest on capture** — wire a model backend into `INGEST_CMD` and enable the
       file-watcher trigger (n8n workflow template + systemd units included, shipped disabled)
+- [x] **Agent skills** — ingest, random spot-audit, mushroom-mode discovery, full diagnostic
+- [x] **More sources** — AI-chat exports (low-trust funnel), wearables, OCR notes
+- [x] **Story layer** _(optional)_ — grounded self-narrative + generated `Book.md` / `Seed.md`
 - [ ] **Agentic query/search** — ask the wiki questions and file good answers back as pages
 
 ---
@@ -158,5 +190,6 @@ before you start are in [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
 
 [MIT](LICENSE) © Will Douglas.
 
-The `00-Raw/` and `10-Refined/` content in this repo is **synthetic example data** for
-illustration — it is not a real personal knowledge base.
+The `00-Raw/`, `10-Refined/`, `30-Story/` and `90-Export/` content in this repo (including the
+wearable day files and AI-chat archives) is **synthetic example data** for illustration — it is
+not a real personal knowledge base.

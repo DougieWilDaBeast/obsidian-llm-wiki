@@ -2,7 +2,7 @@
 type: moc
 title: Weather Station MOC
 created: 2026-01-04
-updated: 2026-01-05
+updated: 2026-01-11
 status: active
 tags: []
 ---
@@ -28,3 +28,5 @@ Map of Content for the [[Backyard Weather Station]] project and everything aroun
 
 - [[2026-01-04 Voice — weather station sensor ideas]]
 - [[Clipping — BME280 sensor overview]]
+- [[OCR — bench wiring sketch]]
+- [[AI-Chat — Should I log the weather station to a Pi or the cloud]] _(trust: low)_

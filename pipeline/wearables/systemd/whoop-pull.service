@@ -1,0 +1,23 @@
+# Daily WHOOP pull (server, systemd user unit).
+#
+# Pairs with whoop-pull.timer. Runs the wrapper, which holds /tmp/vault-ingest.lock while
+# writing raw day files; the vault auto-commit timer commits/pushes the finished JSON.
+#
+# Install (on the server, as your user), once the OAuth bootstrap has seeded a refresh token:
+#   mkdir -p ~/whoop-pipeline
+#   cp ~/obsidian-llm-wiki/pipeline/wearables/whoop.env.example ~/whoop-pipeline/whoop.env
+#   chmod 600 ~/whoop-pipeline/whoop.env           # then edit in the real client id/secret
+#   cp ~/obsidian-llm-wiki/pipeline/wearables/systemd/whoop-pull.service ~/.config/systemd/user/
+#   cp ~/obsidian-llm-wiki/pipeline/wearables/systemd/whoop-pull.timer   ~/.config/systemd/user/
+#   (edit ExecStart below if your vault is not at ~/obsidian-llm-wiki)
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now whoop-pull.timer
+#   systemctl --user list-timers | grep whoop
+
+[Unit]
+Description=Daily WHOOP data pull into the vault (00-Raw/Wearables/whoop)
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/whoop-pipeline/whoop.env
+ExecStart=%h/obsidian-llm-wiki/pipeline/wearables/whoop_pull.sh

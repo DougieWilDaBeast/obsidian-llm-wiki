@@ -1,0 +1,15 @@
+# Daily schedule for the WHOOP pull.
+# Fires whoop-pull.service every morning at 09:00 local — WHOOP finalises the night's
+# recovery score after wake, so a morning pull captures a fully-scored prior cycle.
+# The pull's 3-day lookback also backfills anything missed (server down, outage, etc.).
+
+[Unit]
+Description=Run the daily WHOOP pull
+
+[Timer]
+OnCalendar=*-*-* 09:00:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

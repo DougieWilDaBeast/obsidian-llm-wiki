@@ -1,0 +1,51 @@
+{
+  "schema": "whoop-raw/v2",
+  "source": "whoop",
+  "date": "2026-01-06",
+  "pulled_at": "2026-01-06T09:05:00+00:00",
+  "cycle": {
+    "id": 1001,
+    "start": "2026-01-06T06:30:00.000Z",
+    "end": "2026-01-06T22:45:00.000Z",
+    "score_state": "SCORED",
+    "score": {
+      "strain": 9.3,
+      "kilojoule": 9516,
+      "average_heart_rate": 62,
+      "max_heart_rate": 167
+    }
+  },
+  "recovery": {
+    "cycle_id": 1001,
+    "score_state": "SCORED",
+    "score": {
+      "recovery_score": 66,
+      "resting_heart_rate": 55,
+      "hrv_rmssd_milli": 71.7,
+      "spo2_percentage": 96.6,
+      "skin_temp_celsius": 33.58
+    }
+  },
+  "sleep": [
+    {
+      "id": "s1",
+      "nap": false,
+      "score_state": "SCORED",
+      "start": "2026-01-06T23:00:00.000Z",
+      "end": "2026-01-06T06:30:00.000Z",
+      "score": {
+        "stage_summary": {
+          "total_in_bed_time_milli": 27360000.0,
+          "total_awake_time_milli": 1800000,
+          "total_no_data_time_milli": 0,
+          "disturbance_count": 7
+        },
+        "respiratory_rate": 14.6,
+        "sleep_performance_percentage": 95,
+        "sleep_efficiency_percentage": 88,
+        "sleep_consistency_percentage": 75
+      }
+    }
+  ],
+  "workouts": []
+}

@@ -12,6 +12,8 @@
 # Env:  VAULT_ROOT  path to the vault/repo   (default: $HOME/obsidian-llm-wiki)
 #       AUDIO_STAGING  dir new phone clips land in (default: $HOME/VoiceRecordings/Voice Recorder)
 #       WHISPER_VENV   path to the python venv activate script
+#       WHISPER_OFFLINE=1  load the model from cache only (set after the first run downloads it)
+#       (python -u keeps the log unbuffered so it streams while a long batch runs)
 set -uo pipefail
 
 REPO="${VAULT_ROOT:-$HOME/obsidian-llm-wiki}"
@@ -39,5 +41,5 @@ trap 'rm -f "$INGEST_LOCK"' EXIT
   echo "=== $(date -Iseconds) ongoing transcribe run ==="
   # shellcheck disable=SC1090
   source "$VENV"
-  python "$SCRIPT" --sources "$STAGING" --move-processed
+  python -u "$SCRIPT" --sources "$STAGING" --move-processed
 } >> "$LOG" 2>&1

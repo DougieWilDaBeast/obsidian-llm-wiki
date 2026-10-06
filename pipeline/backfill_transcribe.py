@@ -159,6 +159,10 @@ def main() -> int:
     ap.add_argument("--sources", nargs="*", type=Path, default=DEFAULT_SOURCES,
                     help="Audio source directories (scanned recursively).")
     ap.add_argument("--model", default="small", help="faster-whisper model size.")
+    ap.add_argument("--offline", action="store_true",
+                    default=os.environ.get("WHISPER_OFFLINE", "") not in ("", "0", "false"),
+                    help="Load the model from the local cache only, never the network "
+                         "(env WHISPER_OFFLINE=1). Run once without it to download the model.")
     ap.add_argument("--dry-run", action="store_true", help="Inventory only; no transcription or writes.")
     ap.add_argument("--limit", type=int, default=0, help="Process at most N recordings (0 = all).")
     ap.add_argument("--move-processed", action="store_true",
@@ -186,7 +190,12 @@ def main() -> int:
 
     from faster_whisper import WhisperModel  # imported lazily so --dry-run needs no deps
     print(f"\nLoading model '{args.model}' (cpu/int8)…")
-    model = WhisperModel(args.model, device="cpu", compute_type="int8")
+    model = WhisperModel(
+        args.model,
+        device="cpu",
+        compute_type="int8",
+        local_files_only=args.offline,  # timer runs stay off the network once cached
+    )
 
     done = 0
     skipped = 0
