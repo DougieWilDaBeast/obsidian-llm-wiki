@@ -5,6 +5,9 @@ typed thoughts — flow in at one end; an LLM agent does all the tedious bookkee
 summarising, cross-linking, indexing) and a clean, compounding wiki comes out the other end.
 You curate and direct; the agent files.
 
+A personal project by [Will Douglas](https://github.com/DougieWilDaBeast). It runs his own
+knowledge base; this repo is the system with a fictional example vault in place of his notes.
+
 It's built on plain Markdown in an [Obsidian](https://obsidian.md) vault, version-controlled
 with git, and wired together with a small pipeline of local scripts. The whole "brain" — how
 the agent thinks about your knowledge — lives in a single human-readable file,
@@ -137,7 +140,7 @@ Run `pipeline/selftest_ingest.sh` to verify the safety behaviour without writing
 ## Quick start
 
 ```bash
-git clone https://github.com/<you>/obsidian-llm-wiki.git
+git clone https://github.com/DougieWilDaBeast/obsidian-llm-wiki.git
 cd obsidian-llm-wiki
 
 # 1. Open the folder as a vault in Obsidian (and read CLAUDE.md).
